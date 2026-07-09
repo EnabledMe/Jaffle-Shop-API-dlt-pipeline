@@ -1,0 +1,35 @@
+name: Jaffle Shop dlt Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+  schedule:
+    - cron: "0 */6 * * *"   # every 6 hours
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Run dlt pipeline
+      run: |
+        python pipeline.py
+
+    - name: Upload DuckDB output
+      uses: actions/upload-artifact@v3
+      with:
+        name: jaffle-duckdb
+        path: jaffle_shop_fastest.duckdb
